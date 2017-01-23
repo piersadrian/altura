@@ -1,0 +1,26 @@
+{
+  "name": "redux-patterns",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": {},
+  "license": "MIT",
+  "scripts": {
+    "test": "jest"
+  },
+  "jest": {
+    "testRegex": "test/.+\\.test\\.js"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.22.2",
+    "babel-core": "^6.22.1",
+    "babel-plugin-transform-flow-strip-types": "^6.22.0",
+    "babel-preset-latest": "^6.22.0",
+    "babel-root-import": "^4.1.5",
+    "flow-bin": "^0.38.0",
+    "jest": "^18.1.0",
+    "standard-flow": "^1.0.0"
+  },
+  "dependencies": {
+    "ramda": "^0.23.0"
+  }
+}
