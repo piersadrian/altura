@@ -1,26 +1,6 @@
 // @flow
 import R from 'ramda'
 
-// const buildReducer = (states, defaultState) => (state = defaultState, action) => {
-//   if (action.type === states.REQUEST) {
-//     return R.merge(state, {
-//       isFetching: true
-//     })
-//   } else if (action.type === states.SUCCESS) {
-//     return R.merge(state, {
-//       isFetching: false,
-//       data: action.data
-//     })
-//   } else if (action.type === states.FAILURE) {
-//     return R.merge(state, {
-//       isFetching: false,
-//       error: action.error
-//     })
-//   } else {
-//     return state
-//   }
-// }
-
 export type Reducer = (state: Object, action: Action) => Object
 export type State = { [key: string]: mixed }
 export type ActionType = string
@@ -45,7 +25,10 @@ const configureReducer =
   (state: State, action: Action): State =>
   R.ifElse(
     R.propEq('type', actionType),
-    R.curry(merger)(R.defaultTo(defaultState, state)),
+    R.pipe(
+      R.curry(merger)(R.defaultTo(defaultState, state)),
+      throwIfNoStateObject
+    ),
     R.always(defaultState)
   )(action)
 

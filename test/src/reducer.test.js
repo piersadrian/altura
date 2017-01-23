@@ -11,7 +11,6 @@ const action = R.merge(actionData, { type: 'action.type' })
 
 describe('configureReducer', () => {
   const reducer = configureReducer(defaultState, 'action.type', merger)
-  // const reducer = makeReducer('action.type', merger)
 
   it('returns default state when action doesn\'t match', () => {
     const state = R.merge(defaultState, { data: { previous: 'data' } })
@@ -26,5 +25,10 @@ describe('configureReducer', () => {
 
   it('returns new state when action matches and state is null', () => {
     expect(reducer(null, action)).toEqual(R.merge(defaultState, actionData))
+  })
+
+  it('prevents accidentally returning a function from a merger', () => {
+    const reducer = configureReducer(defaultState, 'action.type', (state, action) => R.merge(state))
+    expect(() => { reducer(null, action) }).toThrow()
   })
 })
