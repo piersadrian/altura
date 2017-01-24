@@ -1,13 +1,13 @@
 // @flow
 import R from 'ramda'
 
+import {
+  type Action,
+  type ActionType
+} from '~/src/action'
+
 export type Reducer = (state: Object, action: Action) => Object
 export type State = { [key: string]: mixed }
-export type ActionType = string
-export type Action = {
-  type: ActionType,
-  data: Object
-}
 
 const throwIfNoStateObject = R.ifElse(
   R.either(

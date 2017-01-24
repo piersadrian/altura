@@ -1,11 +1,16 @@
 // @flow
 // import R from 'ramda'
 
-const buildActionCreator = (type) => (data, error) => {
-  return {
+export type ActionType = string
+export type Action = {
+  type: ActionType,
+  data: mixed
+}
+
+export const configureDataAction =
+  (type: ActionType) =>
+  (data: Object) => ({
     timestamp: Date.now(),
     type,
-    data,
-    error
-  }
-}
+    data
+  })
