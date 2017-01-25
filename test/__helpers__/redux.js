@@ -2,7 +2,7 @@
 // @flow
 import R from 'ramda'
 
-export const pickCallProps = (mockFn: JestMockFn, props: Array<string>): Array<Array<any>> =>
+export const pickCallProps = (mockFn: JestMockFn, props: Array<string>): Array<Array<mixed>> =>
   R.map(
     R.map(
       R.pick(props)
