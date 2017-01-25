@@ -6,8 +6,8 @@ import {
   type ActionType
 } from '~/src/action'
 
-export type Reducer = (state: Object, action: Action) => Object
 export type State = { [key: string]: mixed }
+export type Reducer = (state: State, action: Action) => State
 
 const throwIfNoStateObject = R.ifElse(
   R.either(
