@@ -19,6 +19,7 @@
     "flow-bin": "^0.38.0",
     "flow-typed": "^2.0.0",
     "jest": "^18.1.0",
+    "redux": "^3.6.0",
     "standard-flow": "^1.0.0"
   },
   "dependencies": {
