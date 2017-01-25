@@ -17,6 +17,7 @@
     "babel-preset-latest": "^6.22.0",
     "babel-root-import": "^4.1.5",
     "flow-bin": "^0.38.0",
+    "flow-typed": "^2.0.0",
     "jest": "^18.1.0",
     "standard-flow": "^1.0.0"
   },
