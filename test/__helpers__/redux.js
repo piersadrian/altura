@@ -13,3 +13,5 @@ export const expectDispatchedAction = (dispatchMock: JestMockFn, shape: Object) 
   const dispatchedActions = pickCallProps(dispatchMock, R.keys(shape))
   expect(dispatchedActions).toContainEqual([shape])
 }
+
+export const mockDispatch = jest.fn(R.identity)
