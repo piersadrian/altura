@@ -12,10 +12,17 @@ const action = R.merge(actionData, { type: 'action.type' })
 describe('configureReducer', () => {
   const reducer = configureReducer(defaultState, 'action.type', merger)
 
-  it('returns default state when action doesn\'t match', () => {
-    const state = R.merge(defaultState, { data: { previous: 'data' } })
-    const action = { type: 'different.action' }
-    expect(reducer(state, action)).toEqual(defaultState)
+  describe('when action does not match', () => {
+    it('returns state if given', () => {
+      const state = R.merge(defaultState, { data: { previous: 'data' } })
+      const action = { type: 'different.action' }
+      expect(reducer(state, action)).toEqual(state)
+    })
+
+    it('returns default state if no state is given', () => {
+      const action = { type: 'different.action' }
+      expect(reducer(null, action)).toEqual(defaultState)
+    })
   })
 
   it('returns new state when action matches', () => {

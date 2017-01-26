@@ -29,7 +29,7 @@ const configureReducer =
       R.curry(merger)(R.defaultTo(defaultState, state)),
       throwIfNoStateObject
     ),
-    R.always(defaultState)
+    R.always(R.defaultTo(defaultState, state))
   )(action)
 
 export default R.curry(configureReducer)

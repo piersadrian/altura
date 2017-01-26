@@ -1,5 +1,6 @@
 // @flow
 import R from 'ramda'
+import { combineReducers } from 'redux'
 
 import {
   type Action,
@@ -28,11 +29,26 @@ export const configureCRUDMerger =
     R.merge(defaultState)
   )(action)
 
+const makeReducerMap = R.curry(
+  (actionTypes: Array<ActionType>, state: State) =>
+  R.reduce(
+    (actions, actionType) =>
+      R.assoc(
+        actionType,
+        configureReducer(state, actionType, configureCRUDMerger(state)),
+        actions
+      ),
+    {},
+    actionTypes
+  )
+)
+
 const crudReducer =
-  (actionType: ActionType, defaultResponseState: State): Reducer =>
+  (defaultResponseState: State): Reducer =>
   R.pipe(
     defaultCRUDState,
-    (state) => configureReducer(state, actionType, configureCRUDMerger(state))
+    makeReducerMap(['request', 'success', 'failure']),
+    combineReducers
   )(defaultResponseState)
 
 export default R.curry(crudReducer)
