@@ -28,13 +28,11 @@ export const configureCRUDMerger =
     R.merge(defaultState)
   )(action)
 
-const crudReducer = (actionType: ActionType, defaultResponseState: State): Reducer => {
-  const defaultState = defaultCRUDState(defaultResponseState)
+const crudReducer =
+  (actionType: ActionType, defaultResponseState: State): Reducer =>
+  R.pipe(
+    defaultCRUDState,
+    (state) => configureReducer(state, actionType, configureCRUDMerger(state))
+  )(defaultResponseState)
 
-  return R.pipe(
-    R.always(configureCRUDMerger(defaultState)),
-    configureReducer(defaultState, actionType)
-  )(actionType, defaultResponseState)
-}
-
-export default crudReducer
+export default R.curry(crudReducer)
