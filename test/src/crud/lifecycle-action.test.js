@@ -6,7 +6,7 @@ describe('lifecycleAction', () => {
   const actionCreator = lifecycleAction('action.type', 'request', true)
 
   it('merges data correctly', () => {
-    const action = actionCreator({ some: 'data' })
+    const action = actionCreator({ data: { some: 'data' } })
     expect(action).toMatchObject({
       type: 'action.type.request',
       isFetching: true,
@@ -18,7 +18,7 @@ describe('lifecycleAction', () => {
 
   it('includes data but not error when passed that way', () => {
     const error = new Error({ some: 'data' })
-    const action = actionCreator(null, error)
+    const action = actionCreator({ error })
     expect(action).toMatchObject({
       type: 'action.type.request',
       isFetching: true,

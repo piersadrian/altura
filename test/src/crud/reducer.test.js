@@ -1,15 +1,13 @@
 /* eslint-env jest */
-import R from 'ramda'
 
-import crudReducer, { configureCRUDMerger } from '~/src/crud-reducer'
+import crudReducer, {
+  configureCRUDMerger,
+  defaultCRUDState
+} from '~/src/crud/reducer'
 
 const actionType = 'action.type'
 const defaultResponseState = { name: '', email: '' }
-const defaultState = {
-  isFetching: false,
-  timestamp: null,
-  data: defaultResponseState
-}
+const defaultState = defaultCRUDState(defaultResponseState)
 
 describe('crudReducer', () => {
   const reducer = crudReducer(actionType, defaultResponseState)
@@ -39,24 +37,21 @@ describe('configureCRUDMerger', () => {
   const merger = configureCRUDMerger(defaultState)
 
   it('only merges keys in the default state', () => {
-    const newState = merger({ some: 'state' }, { type: actionType, isFetching: true, key: 'blah' })
-
-    const sortKeys = R.pipe(
-      R.keys,
-      R.sort((lhs, rhs) => lhs < rhs)
-    )
-
-    expect(sortKeys(newState)).toEqual(sortKeys(defaultState))
+    const newState = merger({ some: 'state' }, { type: actionType, isFetching: true, nope: 'blah' })
     expect(newState.isFetching).toBe(true)
+    expect(newState.nope).toBeUndefined()
   })
 
   it('merges response state under the "data" key', () => {
-    const newState = merger(null, { type: actionType, isFetching: false, data: { name: 'Jones' } })
+    const newState = merger(
+      { data: { name: 'Smith' } },
+      { type: actionType, isFetching: false, data: { name: 'Jones' } }
+    )
     expect(newState.data.name).toEqual('Jones')
   })
 
   it('does not merge keys if they are not present on the action', () => {
     const newState = merger({ some: 'state' }, { type: actionType, isFetching: true })
-    expect(newState).toMatchObject({ data: { name: '' } })
+    expect(newState).toMatchObject({ isFetching: true, data: { name: '' } })
   })
 })

@@ -31,8 +31,8 @@ const requestAction =
       R.tap(R.always(dispatch(actions.request()))),
       R.curry(handler)(R.__, getState),
       (promise) => promise
-        .then((data: Object) => dispatch(actions.success(data)))
-        .catch((error: Object) => dispatch(actions.failure(null, error)))
+        .then((data: Object) => dispatch(actions.success({ data })))
+        .catch((error: Object) => dispatch(actions.failure({ error })))
     ),
     R.always(Promise.resolve())
   )(getBody)

@@ -4,13 +4,13 @@ import R from 'ramda'
 import { makeActionType, type ActionType } from '~/src/action'
 import { type State } from '~/src/reducer'
 
-export type LifecycleActionCreator = (data: ?Object, error: ?Object) => State
+export type LifecycleActionCreator = (options?: { data?: Object, error?: Object }) => State
 export type LifecycleState = 'request' | 'success' | 'failure'
 export type LifecycleActions = { [key: LifecycleState]: LifecycleActionCreator }
 
 const lifecycleAction =
   (type: ActionType, state: LifecycleState, isFetching: Boolean): LifecycleActionCreator =>
-  (data: ?Object = null, error: ?Object = null): State =>
+  ({ data, error } = {}): State =>
   R.pipe(
     R.when(
       R.always(R.not(R.isNil(data))),

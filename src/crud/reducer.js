@@ -14,20 +14,18 @@ import configureReducer, {
 export const defaultCRUDState = (defaultResponseState: State) => ({
   isFetching: false,
   timestamp: null,
-  data: defaultResponseState
+  data: defaultResponseState,
+  error: null
 })
 
 export const configureCRUDMerger =
   (defaultState: State): Reducer =>
   (state: State, action: Action): State =>
   R.pipe(
-    R.pipe(
-      R.always(R.keys(defaultState)),
-      R.filter(R.has(R.__, action)),
-    ),
+    R.always(R.keys(defaultState)),
+    R.filter(R.has),
     R.pick(R.__, action),
-    R.merge(defaultState),
-    R.merge({ data: state })
+    R.merge(defaultState)
   )(action)
 
 const crudReducer = (actionType: ActionType, defaultResponseState: State): Reducer => {
