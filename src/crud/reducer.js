@@ -1,6 +1,5 @@
 // @flow
 import R from 'ramda'
-import { combineReducers } from 'redux'
 
 import {
   makeActionType,
@@ -8,13 +7,14 @@ import {
   type ActionType
 } from '~/src/action'
 
+import { inFlightStatusKey } from '~/src/crud/lifecycle-action'
 import configureReducer, {
   type Reducer,
   type State
 } from '~/src/reducer'
 
 export const defaultCRUDState = (defaultResponseState: State) => ({
-  isFetching: false,
+  [inFlightStatusKey]: false,
   timestamp: null,
   data: defaultResponseState,
   error: null

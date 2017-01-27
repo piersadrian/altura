@@ -8,8 +8,10 @@ export type LifecycleActionCreator = (options?: { data?: Object, error?: Object 
 export type LifecycleState = 'request' | 'success' | 'failure'
 export type LifecycleActions = { [key: LifecycleState]: LifecycleActionCreator }
 
+export const inFlightStatusKey = 'isFetching'
+
 const lifecycleAction =
-  (type: ActionType, state: LifecycleState, isFetching: Boolean): LifecycleActionCreator =>
+  (type: ActionType, state: LifecycleState, inFlight: Boolean): LifecycleActionCreator =>
   ({ data, error } = {}): State =>
   R.pipe(
     R.when(
@@ -23,7 +25,7 @@ const lifecycleAction =
   )({
     timestamp: Date.now(),
     type: makeActionType(type, state),
-    isFetching
+    [inFlightStatusKey]: inFlight
   })
 
 export default R.curry(lifecycleAction)

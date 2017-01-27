@@ -3,7 +3,10 @@ import R from 'ramda'
 
 import { makeActionPath, type ActionType } from '~/src/action'
 import { type State } from '~/src/reducer'
-import { type LifecycleActions } from '~/src/crud/lifecycle-action'
+import {
+  inFlightStatusKey,
+  type LifecycleActions
+} from '~/src/crud/lifecycle-action'
 
 export type CRUDAction = {
   type: ActionType,
@@ -25,7 +28,7 @@ const requestAction =
   R.ifElse(
     R.pipe(
       R.always(R.path(makeActionPath(type), getState())),
-      R.propEq('isFetching', false),
+      R.propEq(inFlightStatusKey, false),
     ),
     R.pipe(
       R.tap(R.always(dispatch(actions.request()))),

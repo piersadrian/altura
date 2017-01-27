@@ -6,7 +6,6 @@ import {
   mockDispatch
 } from '~/test/__helpers__/redux'
 
-
 const endpointName = 'index'
 const getState = () => ({
   [endpointName]: {
