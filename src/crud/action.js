@@ -8,7 +8,7 @@ import requestAction, {
   type RequestHandler
 } from '~/src/crud/request-action'
 
-const resourceAction =
+const endpointAction =
   (actionName: String, requestHandler: RequestHandler): RequestActionCreator =>
   R.pipe(
     (actionName) => ({
@@ -16,7 +16,7 @@ const resourceAction =
       success: lifecycleAction(actionName, 'success', false),
       failure: lifecycleAction(actionName, 'failure', false)
     }),
-    requestAction(actionName, requestHandler),
+    requestAction(actionName, requestHandler)
   )(actionName)
 
-export default R.curry(resourceAction)
+export default R.curry(endpointAction)

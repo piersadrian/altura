@@ -6,33 +6,28 @@ import crudReducer, {
 } from '~/src/crud/reducer'
 
 const defaultResponseState = { name: '', email: '' }
-const buildState = (responseState) => ({
-  request: defaultCRUDState(responseState),
-  success: defaultCRUDState(responseState),
-  failure: defaultCRUDState(responseState)
-})
 
 describe('crudReducer', () => {
   const reducer = crudReducer(defaultResponseState, 'index')
   const state = { name: 'Tom Jones', email: 'tommy@welsh.singers' }
 
   it('embeds default response state in a CRUD-friendly structure', () => {
-    const previousState = buildState(defaultResponseState)
+    const previousState = defaultCRUDState(defaultResponseState)
     const action = { type: 'request' }
     expect(reducer(previousState, action)).toEqual(previousState)
   })
 
   describe('when action type matches', () => {
     it('returns mutated state', () => {
-      const previousState = buildState(state)
+      const previousState = defaultCRUDState(state)
       const action = { type: 'index.success', data: { name: 'Charlotte Church' } }
-      expect(reducer(previousState, action).success.data).toEqual(action.data)
+      expect(reducer(previousState, action).data).toEqual(action.data)
     })
   })
 
   describe('when action type does not match', () => {
     it('returns the given state', () => {
-      const previousState = buildState(state)
+      const previousState = defaultCRUDState(state)
       const action = { type: 'otherAction', data: { name: 'Charlotte Church' } }
       expect(reducer(previousState, action)).toEqual(previousState)
     })

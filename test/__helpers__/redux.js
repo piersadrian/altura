@@ -14,4 +14,4 @@ export const expectDispatchedAction = (dispatchMock: JestMockFn, shape: Object) 
   expect(dispatchedActions).toContainEqual([shape])
 }
 
-export const mockDispatch = jest.fn(R.identity)
+export const mockDispatch = (fn: Function = R.identity) => jest.fn(fn)

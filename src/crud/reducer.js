@@ -30,20 +30,24 @@ export const configureCRUDMerger =
     R.merge(defaultState),
   )(action)
 
-const buildReducer =
-  (defaultState: State, actionType: ActionType) =>
-  configureReducer(defaultState, actionType, configureCRUDMerger(defaultState))
+const buildCombinedReducer =
+  (defaultState: State, actionTypes: Array<ActionType>): Reducer =>
+  (state: State, action: Action) =>
+  R.reduce(
+    (state, reducer) => reducer(state, action),
+    state,
+    R.map(configureReducer(defaultState, R.__, configureCRUDMerger(defaultState)), actionTypes)
+  )
 
 const crudReducer =
   (defaultResponseState: State, actionType: ActionType): Reducer =>
   R.pipe(
     defaultCRUDState,
-    (defaultState) => ({
-      request: buildReducer(defaultState, makeActionType(actionType, 'request')),
-      success: buildReducer(defaultState, makeActionType(actionType, 'success')),
-      failure: buildReducer(defaultState, makeActionType(actionType, 'failure'))
-    }),
-    combineReducers
+    R.curry(buildCombinedReducer)(R.__, [
+      makeActionType(actionType, 'request'),
+      makeActionType(actionType, 'success'),
+      makeActionType(actionType, 'failure')
+    ])
   )(defaultResponseState)
 
 export default R.curry(crudReducer)

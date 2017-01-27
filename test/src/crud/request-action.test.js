@@ -7,6 +7,7 @@ import {
   mockDispatch
 } from '~/test/__helpers__/redux'
 
+const dispatch = mockDispatch()
 const actionType = 'actiontype'
 const lifecycleActions = {
   request: jest.fn(lifecycleAction(actionType, 'request', true)),
@@ -27,14 +28,14 @@ describe('requestAction', () => {
   })
 
   it('always dispatches the start-request handler', () => {
-    actionCreator(mockDispatch, getState)
+    actionCreator(dispatch, getState)
     expect(lifecycleActions.request).toHaveBeenCalled()
-    expectDispatchedAction(mockDispatch, { isFetching: true })
+    expectDispatchedAction(dispatch, { isFetching: true })
   })
 
   it('always passes getState to the request handler', () => {
     const actionCreator = requestAction(actionType, handler, lifecycleActions)()
-    actionCreator(mockDispatch, getState)
+    actionCreator(dispatch, getState)
     expect(handler).toHaveBeenCalledWith(null, getState)
   })
 
@@ -42,7 +43,7 @@ describe('requestAction', () => {
     const getBody = () => ({ some: 'state' })
     const actionCreator = requestAction(actionType, handler, lifecycleActions)(getBody)
 
-    actionCreator(mockDispatch, getState)
+    actionCreator(dispatch, getState)
     expect(handler).toHaveBeenCalledWith(getBody, getState)
   })
 
@@ -52,10 +53,10 @@ describe('requestAction', () => {
     const actionCreator = requestAction(actionType, handler, lifecycleActions)()
 
     it('dispatches the success handler', () => {
-      actionCreator(mockDispatch, getState)
-      .then(() => {
+      actionCreator(dispatch, getState)
+      .then((val) => {
         expect(lifecycleActions.success).toHaveBeenCalled()
-        expectDispatchedAction(mockDispatch, { isFetching: false, data: responseData })
+        expectDispatchedAction(dispatch, { isFetching: false, data: responseData })
       })
     })
   })
@@ -66,10 +67,10 @@ describe('requestAction', () => {
     const actionCreator = requestAction(actionType, handler, lifecycleActions)()
 
     it('dispatches the success handler', () => {
-      actionCreator(mockDispatch, getState)
+      actionCreator(dispatch, getState)
       .then(() => {
         expect(lifecycleActions.failure).toHaveBeenCalled()
-        expectDispatchedAction(mockDispatch, { isFetching: false, error: error })
+        expectDispatchedAction(dispatch, { isFetching: false, error: error })
       })
     })
   })
