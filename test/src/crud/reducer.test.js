@@ -13,7 +13,7 @@ const buildState = (responseState) => ({
 })
 
 describe('crudReducer', () => {
-  const reducer = crudReducer(defaultResponseState)
+  const reducer = crudReducer(defaultResponseState, 'index')
   const state = { name: 'Tom Jones', email: 'tommy@welsh.singers' }
 
   it('embeds default response state in a CRUD-friendly structure', () => {
@@ -25,7 +25,7 @@ describe('crudReducer', () => {
   describe('when action type matches', () => {
     it('returns mutated state', () => {
       const previousState = buildState(state)
-      const action = { type: 'success', data: { name: 'Charlotte Church' } }
+      const action = { type: 'index.success', data: { name: 'Charlotte Church' } }
       expect(reducer(previousState, action).success.data).toEqual(action.data)
     })
   })

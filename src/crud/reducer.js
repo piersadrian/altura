@@ -3,6 +3,7 @@ import R from 'ramda'
 import { combineReducers } from 'redux'
 
 import {
+  makeActionType,
   type Action,
   type ActionType
 } from '~/src/action'
@@ -26,28 +27,22 @@ export const configureCRUDMerger =
     R.always(R.keys(defaultState)),
     R.filter(R.has),
     R.pick(R.__, action),
-    R.merge(defaultState)
+    R.merge(defaultState),
   )(action)
 
-const makeReducerMap = R.curry(
-  (actionTypes: Array<ActionType>, state: State) =>
-  R.reduce(
-    (actions, actionType) =>
-      R.assoc(
-        actionType,
-        configureReducer(state, actionType, configureCRUDMerger(state)),
-        actions
-      ),
-    {},
-    actionTypes
-  )
-)
+const buildReducer =
+  (defaultState: State, actionType: ActionType) =>
+  configureReducer(defaultState, actionType, configureCRUDMerger(defaultState))
 
 const crudReducer =
-  (defaultResponseState: State): Reducer =>
+  (defaultResponseState: State, actionType: ActionType): Reducer =>
   R.pipe(
     defaultCRUDState,
-    makeReducerMap(['request', 'success', 'failure']),
+    (defaultState) => ({
+      request: buildReducer(defaultState, makeActionType(actionType, 'request')),
+      success: buildReducer(defaultState, makeActionType(actionType, 'success')),
+      failure: buildReducer(defaultState, makeActionType(actionType, 'failure'))
+    }),
     combineReducers
   )(defaultResponseState)
 
