@@ -28,23 +28,25 @@ describe('requestAction', () => {
   })
 
   it('always dispatches the start-request handler', () => {
-    actionCreator(dispatch, getState)
-    expect(lifecycleActions.request).toHaveBeenCalled()
-    expectDispatchedAction(dispatch, { isFetching: true })
+    return actionCreator(dispatch, getState)
+    .then(() => {
+      expect(lifecycleActions.request).toHaveBeenCalled()
+      expectDispatchedAction(dispatch, { isFetching: true })
+    })
   })
 
   it('always passes getState to the request handler', () => {
     const actionCreator = requestAction(actionType, handler, lifecycleActions)()
-    actionCreator(dispatch, getState)
-    expect(handler).toHaveBeenCalledWith(null, getState)
+    return actionCreator(dispatch, getState)
+    .then(() => expect(handler).toHaveBeenCalledWith(getState))
   })
 
-  it('passes getBody to the request handler, if given', () => {
-    const getBody = () => ({ some: 'state' })
-    const actionCreator = requestAction(actionType, handler, lifecycleActions)(getBody)
+  it('passes context to the request handler, if given', () => {
+    const context = () => ({ some: 'state' })
+    const actionCreator = requestAction(actionType, handler, lifecycleActions)(context)
 
-    actionCreator(dispatch, getState)
-    expect(handler).toHaveBeenCalledWith(getBody, getState)
+    return actionCreator(dispatch, getState)
+    .then(() => expect(handler).toHaveBeenCalledWith(getState, context))
   })
 
   describe('when the request succeeds', () => {
@@ -53,8 +55,8 @@ describe('requestAction', () => {
     const actionCreator = requestAction(actionType, handler, lifecycleActions)()
 
     it('dispatches the success handler', () => {
-      actionCreator(dispatch, getState)
-      .then((val) => {
+      return actionCreator(dispatch, getState)
+      .then(() => {
         expect(lifecycleActions.success).toHaveBeenCalled()
         expectDispatchedAction(dispatch, { isFetching: false, data: responseData })
       })
@@ -67,11 +69,15 @@ describe('requestAction', () => {
     const actionCreator = requestAction(actionType, handler, lifecycleActions)()
 
     it('dispatches the success handler', () => {
-      actionCreator(dispatch, getState)
+      const result = actionCreator(dispatch, getState)
       .then(() => {
         expect(lifecycleActions.failure).toHaveBeenCalled()
         expectDispatchedAction(dispatch, { isFetching: false, error: error })
       })
+
+      // console.log(result)
+
+      return result
     })
   })
 })

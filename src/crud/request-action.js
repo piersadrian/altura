@@ -16,14 +16,13 @@ export type CRUDAction = {
 }
 
 export type GetState = () => State
-export type GetRequestBody = (getState: GetState) => Object
-export type RequestHandler = (getBody: ?GetRequestBody, getState: GetState) => Promise<State>
+export type RequestHandler = (getState: GetState, ...context: Array<mixed>) => Promise<State>
 export type RequestActionCreator =
-  (getBody: GetRequestBody) => (dispatch: Function, getState: Function) => Promise<State>
+  (context: mixed) => (dispatch: Function, getState: Function) => Promise<State>
 
 const requestAction =
   (type: ActionType, handler: RequestHandler, actions: LifecycleActions): RequestActionCreator =>
-  (getBody: ?GetRequestBody = null) =>
+  (...context: Array<mixed>) =>
   (dispatch: Function, getState: Function): Promise<State> =>
   R.ifElse(
     R.pipe(
@@ -32,12 +31,13 @@ const requestAction =
     ),
     R.pipe(
       R.tap(R.always(dispatch(actions.request()))),
-      R.curryN(2, handler)(R.__, getState),
+      R.concat([getState]),
+      R.apply(R.curryN(context.length + 1, handler)),
       (promise) => promise
         .then((data: Object) => dispatch(actions.success({ data })))
         .catch((error: Object) => dispatch(actions.failure({ error })))
     ),
     R.always(Promise.resolve())
-  )(getBody)
+  )(context)
 
 export default R.curry(requestAction)
