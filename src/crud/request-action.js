@@ -17,8 +17,8 @@ export type CRUDAction = {
 
 export type GetState = () => State
 export type RequestHandler = (getState: GetState, ...context: Array<mixed>) => Promise<State>
-export type RequestActionCreator =
-  (context: mixed) => (dispatch: Function, getState: Function) => Promise<State>
+export type ThunkActionCreator = (dispatch: Function, getState: GetState) => Promise<State>
+export type RequestActionCreator = (...context: Array<mixed>) => ThunkActionCreator
 
 const requestAction =
   (type: ActionType, handler: RequestHandler, actions: LifecycleActions): RequestActionCreator =>

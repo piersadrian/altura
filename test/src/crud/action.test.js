@@ -15,8 +15,8 @@ const getState = () => ({
     error: null
   }
 })
-const dispatch = mockDispatch((action) => typeof action === 'function' ? action(dispatch, getState) : action)
 
+const dispatch = mockDispatch((action) => typeof action === 'function' ? action(dispatch, getState) : action)
 beforeEach(() => dispatch.mockClear())
 
 describe('action', () => {
