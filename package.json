@@ -1,10 +1,12 @@
 {
   "name": "redux-patterns",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "repository": {},
   "license": "MIT",
   "scripts": {
+    "build": "babel src --out-dir dist",
+    "prepublish": "npm run build",
     "test": "jest"
   },
   "jest": {
