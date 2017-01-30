@@ -2,6 +2,7 @@
 
 import R from 'ramda'
 
+import { type ActionType } from '~/src/action'
 import lifecycleAction from '~/src/crud/lifecycle-action'
 import requestAction, {
   type RequestActionCreator,
@@ -9,14 +10,15 @@ import requestAction, {
 } from '~/src/crud/request-action'
 
 const endpointAction =
-  (actionName: String, requestHandler: RequestHandler): RequestActionCreator =>
+  (actionType: ActionType,
+  requestHandler: RequestHandler): RequestActionCreator =>
   R.pipe(
-    (actionName) => ({
-      request: lifecycleAction(actionName, 'request', true),
-      success: lifecycleAction(actionName, 'success', false),
-      failure: lifecycleAction(actionName, 'failure', false)
+    (actionType) => ({
+      request: lifecycleAction(actionType, 'request', true),
+      success: lifecycleAction(actionType, 'success', false),
+      failure: lifecycleAction(actionType, 'failure', false)
     }),
-    requestAction(actionName, requestHandler)
-  )(actionName)
+    requestAction(actionType, requestHandler)
+  )(actionType)
 
 export default R.curry(endpointAction)

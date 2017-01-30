@@ -38,7 +38,7 @@ describe('requestAction', () => {
   it('always passes getState to the request handler', () => {
     const actionCreator = requestAction(actionType, handler, lifecycleActions)()
     return actionCreator(dispatch, getState)
-    .then(() => expect(handler).toHaveBeenCalledWith(getState))
+    .then(() => expect(handler).toHaveBeenCalledWith(undefined, getState))
   })
 
   it('passes context to the request handler, if given', () => {
@@ -46,7 +46,7 @@ describe('requestAction', () => {
     const actionCreator = requestAction(actionType, handler, lifecycleActions)(context)
 
     return actionCreator(dispatch, getState)
-    .then(() => expect(handler).toHaveBeenCalledWith(getState, context))
+    .then(() => expect(handler).toHaveBeenCalledWith(context, getState))
   })
 
   describe('when the request succeeds', () => {

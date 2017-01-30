@@ -1,58 +1,53 @@
 /* eslint-env jest */
 import R from 'ramda'
+import { combineReducers } from 'redux'
 
-import configureResources from '~/src/resource'
-
+import { resource, action } from '~/src/resource'
 import {
   expectDispatchedAction,
   mockDispatch
 } from '~/test/__helpers__/redux'
 
-const resourcesConfig = {
-  index: { name: 'index', path: '/api/v1/documents', method: 'get', collection: true },
-  show: { name: 'show', path: (id) => `/api/v1/documents/${id}`, method: 'get' }
-}
+const item = { title: 'Some Title', body: 'body content' }
+const index = (buildUrl) => (context, getState) => Promise.resolve([item])
+const show = (buildUrl) => (context, getState) => Promise.resolve(item)
 
-const { buildActions, buildReducer } = configureResources(R.values(resourcesConfig))
-const reducer = buildReducer({ title: '', body: '' })
+const documentIndexHandler = jest.fn(index(() => '/documents'))
+const documentShowHandler = jest.fn(show(({ id }) => `/documents/${id}`))
+
+const { actions, reducers } = R.pipe(
+  resource('document', [
+    action('index', [], documentIndexHandler),
+    action('show', { title: '', body: '' }, documentShowHandler)
+  ])
+)({})
+
+const reducer = combineReducers(reducers)
 
 describe('configureResources', () => {
-  it('exposes `buildActions` and `buildReducer` functions', () => {
-    const resourceBuilder = configureResources(R.values(resourcesConfig))
-    expect(resourceBuilder.buildActions).toBeInstanceOf(Function)
-    expect(resourceBuilder.buildReducer).toBeInstanceOf(Function)
-  })
-
   describe('actions', () => {
-    let state = reducer({}, { type: 'INIT' })
-    const getState = jest.fn(() => state)
+    const state = reducer({}, { type: 'INIT' })
+    const getState = () => state
     const dispatch = mockDispatch((action) => {
       const actionValue = typeof action === 'function' ? action(dispatch, getState) : action
       reducer(state, actionValue)
       return actionValue
     })
 
-    const item = { title: 'Some Title', body: 'body content' }
-
     describe('on success', () => {
       it('merge response objects', () => {
-        const showHandler = jest.fn((config, getState, context) => Promise.resolve(item))
-        const actions = buildActions(showHandler)
-        return dispatch(actions.show(2))
+        return dispatch(actions.document.show({ id: 2 }))
         .then(() => {
-          const config = R.assoc('path', resourcesConfig.show.path(2), resourcesConfig.show)
-          expect(showHandler).toHaveBeenCalledWith(config, getState, 2)
-          expectDispatchedAction(dispatch, { type: 'show.success', data: item })
+          expect(documentShowHandler).toHaveBeenCalledWith({ id: 2 }, getState)
+          expectDispatchedAction(dispatch, { type: 'document.show.success', data: item })
         })
       })
 
       it('merge a response collection', () => {
-        const indexHandler = jest.fn((config, getState, context) => Promise.resolve([item]))
-        const actions = buildActions(indexHandler)
-        return dispatch(actions.index())
+        return dispatch(actions.document.index())
         .then(() => {
-          expect(indexHandler).toHaveBeenCalledWith(resourcesConfig.index, getState)
-          expectDispatchedAction(dispatch, { type: 'index.success', data: [item] })
+          expect(documentIndexHandler).toHaveBeenCalledWith(undefined, getState)
+          expectDispatchedAction(dispatch, { type: 'document.index.success', data: [item] })
         })
       })
     })
@@ -61,11 +56,13 @@ describe('configureResources', () => {
   describe('reducer', () => {
     it('produces a combined reducer', () => {
       expect(reducer({}, { type: 'INIT' })).toMatchObject({
-        index: {
-          isFetching: false
-        },
-        show: {
-          isFetching: false
+        document: {
+          index: {
+            isFetching: false
+          },
+          show: {
+            isFetching: false
+          }
         }
       })
     })

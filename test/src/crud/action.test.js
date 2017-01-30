@@ -17,7 +17,6 @@ const getState = () => ({
 })
 
 const dispatch = mockDispatch((action) => typeof action === 'function' ? action(dispatch, getState) : action)
-beforeEach(() => dispatch.mockClear())
 
 describe('action', () => {
   describe('on successful response', () => {

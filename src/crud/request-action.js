@@ -16,13 +16,19 @@ export type CRUDAction = {
 }
 
 export type GetState = () => State
-export type RequestHandler = (getState: GetState, ...context: Array<mixed>) => Promise<State>
+export type RequestHandler = (context: mixed, getState: GetState) => Promise<State>
 export type ThunkActionCreator = (dispatch: Function, getState: GetState) => Promise<State>
 export type RequestActionCreator = (...context: Array<mixed>) => ThunkActionCreator
 
+const checkPromise = (handlerValue) => {
+  if (!R.is(Promise, handlerValue)) {
+    throw new Error('request handler must return a Promise')
+  }
+}
+
 const requestAction =
   (type: ActionType, handler: RequestHandler, actions: LifecycleActions): RequestActionCreator =>
-  (...context: Array<mixed>) =>
+  (context: mixed) =>
   (dispatch: Function, getState: Function): Promise<State> =>
   R.ifElse(
     R.pipe(
@@ -31,8 +37,8 @@ const requestAction =
     ),
     R.pipe(
       R.tap(R.always(dispatch(actions.request()))),
-      R.concat([getState]),
-      R.apply(R.curryN(context.length + 1, handler)),
+      R.curryN(2, handler)(R.__, getState),
+      R.tap(checkPromise),
       (promise) => promise
         .then((data: Object) => dispatch(actions.success({ data })))
         .catch((error: Object) => dispatch(actions.failure({ error })))

@@ -8,8 +8,7 @@ import crudReducer from '~/src/crud/reducer'
 
 import {
   type RequestActionCreator,
-  type RequestHandler,
-  type GetState
+  type RequestHandler
 } from '~/src/crud/request-action'
 
 import {
@@ -17,62 +16,65 @@ import {
   type State
 } from '~/src/reducer'
 
+import { makeActionType } from '~/src/action'
+
 export type ResourceConfig = {|
   name: string,
   path: string | Function,
   method: 'get' | 'post' | 'put' | 'patch' | 'delete' | 'options',
 |}
 
-export type ResourceActions = { [key: string]: RequestActionCreator }
-export type ResourceHandler =
-  (config: ResourceConfig, getState: GetState, ...context: Array<mixed>) => Promise<State>
+type ActionDefinition = {| name: string, defaultState: State, handler: RequestHandler |}
+type ActionMap = { [key: string]: RequestActionCreator }
+type ReducerMap = { [key: string]: Reducer }
+type Resources = {|
+  actions: ActionMap,
+  reducers: ReducerMap
+|}
 
-const requestHandler =
-  (handler: ResourceHandler, config: ResourceConfig): RequestHandler =>
-  (getState: GetState, ...context: Array<mixed>): Promise<State> =>
-  R.pipe(
-    R.when(
-      R.pipe(
-        R.prop('path'),
-        R.is(Function)
-      ),
-      R.pipe(
-        R.prop('path'),
-        R.apply(R.__, context),
-        R.assoc('path', R.__, config)
-      )
-    ),
-    R.prepend(R.__, [getState, ...context]),
-    R.apply(handler)
-  )(config)
-
-export const buildActions = R.curry(
-  (configs: Array<ResourceConfig>, handler: ResourceHandler): ResourceActions =>
+const buildActions =
+  (resourceName: string,
+  definitions: Array<ActionDefinition>): ActionMap =>
   R.reduce(
-    (resources, config) => R.assoc(
-      config.name, endpointAction(config.name, requestHandler(handler, config)), resources
+    (object, definition) => R.assoc(
+      definition.name,
+      endpointAction(makeActionType(resourceName, definition.name), definition.handler),
+      object
     ),
     {}
-  )(configs)
-)
+  )(definitions)
 
-export const buildReducer = R.curry(
-  (configs: Array<ResourceConfig>, defaultState: State): Reducer =>
+const buildReducer =
+  (resourceName: string,
+  definitions: Array<ActionDefinition>): Reducer =>
   R.pipe(
     R.reduce(
-      (reducers, config) => R.assoc(
-        config.name, crudReducer(config.collection ? [] : defaultState, config.name), reducers
+      (object, definition) => R.assoc(
+        definition.name,
+        crudReducer(definition.defaultState, makeActionType(resourceName, definition.name)),
+        object
       ),
       {}
     ),
     combineReducers
-  )(configs)
+  )(definitions)
+
+export const resource = R.curry(
+  (name: string,
+  definitions: Array<ActionDefinition>,
+  resources: Resources): Resources =>
+  R.pipe(
+    R.assocPath(['actions', name], buildActions(name, definitions)),
+    R.assocPath(['reducers', name], buildReducer(name, definitions))
+  )(resources)
 )
 
-const configureResources =
-  (configs: Array<ResourceConfig>) => ({
-    buildActions: buildActions(configs),
-    buildReducer: buildReducer(configs)
+export const action = R.curry(
+  (name: string,
+  defaultState: State,
+  handler: RequestHandler): ActionDefinition => ({
+    name,
+    defaultState,
+    handler
   })
-
-export default configureResources
+)
