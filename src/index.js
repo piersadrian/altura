@@ -1,3 +1,6 @@
-import configureResources from '~/src/resource'
+import { resource, action } from '~/src/resource'
 
-module.exports = configureResources
+module.exports = {
+  resource,
+  action
+}

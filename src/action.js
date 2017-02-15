@@ -15,7 +15,7 @@ export const makeActionType =
 export const makeActionPath =
   (type: ActionType): Array<ActionType> => R.split(STATE_PATH_SEPARATOR, type)
 
-export const configureDataAction = R.curry(
+export const dataAction = R.curry(
   (type: ActionType, data: Object) => ({
     timestamp: Date.now(),
     type,

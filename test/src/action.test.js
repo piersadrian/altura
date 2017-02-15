@@ -1,7 +1,7 @@
 /* eslint-env jest */
 
 import {
-  configureDataAction,
+  dataAction,
   makeActionPath,
   makeActionType
 } from '~/src/action'
@@ -18,9 +18,9 @@ describe('makeActionType', () => {
   })
 })
 
-describe('configureDataAction', () => {
+describe('dataAction', () => {
   it('builds a data action', () => {
-    const action = configureDataAction('action.type', { some: 'data' })
+    const action = dataAction('action.type', { some: 'data' })
     expect(action.timestamp).not.toBeUndefined()
     expect(action).toMatchObject({
       type: 'action.type',

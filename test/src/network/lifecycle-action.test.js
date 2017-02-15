@@ -1,6 +1,6 @@
 /* eslint-env jest */
 
-import lifecycleAction from '~/src/crud/lifecycle-action'
+import lifecycleAction from '~/src/network/lifecycle-action'
 
 describe('lifecycleAction', () => {
   const actionCreator = lifecycleAction('action.type', 'request', true)

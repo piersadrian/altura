@@ -3,7 +3,7 @@
 import crudReducer, {
   configureCRUDMerger,
   defaultCRUDState
-} from '~/src/crud/reducer'
+} from '~/src/endpoint/reducer'
 
 const defaultResponseState = { name: '', email: '' }
 

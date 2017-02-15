@@ -6,7 +6,7 @@ import { type State } from '~/src/reducer'
 import {
   inFlightStatusKey,
   type LifecycleActions
-} from '~/src/crud/lifecycle-action'
+} from '~/src/network/lifecycle-action'
 
 export type CRUDAction = {
   type: ActionType,
@@ -18,7 +18,7 @@ export type CRUDAction = {
 export type GetState = () => State
 export type RequestHandler = (context: mixed, getState: GetState) => Promise<State>
 export type ThunkActionCreator = (dispatch: Function, getState: GetState) => Promise<State>
-export type RequestActionCreator = (...context: Array<mixed>) => ThunkActionCreator
+export type NetworkActionCreator = (...context: Array<mixed>) => ThunkActionCreator
 
 const checkPromise = (handlerValue) => {
   if (!R.is(Promise, handlerValue)) {
@@ -26,8 +26,8 @@ const checkPromise = (handlerValue) => {
   }
 }
 
-const requestAction =
-  (type: ActionType, handler: RequestHandler, actions: LifecycleActions): RequestActionCreator =>
+const networkAction =
+  (type: ActionType, handler: RequestHandler, actions: LifecycleActions): NetworkActionCreator =>
   (context: mixed) =>
   (dispatch: Function, getState: Function): Promise<State> =>
   R.ifElse(
@@ -46,4 +46,4 @@ const requestAction =
     R.always(Promise.resolve())
   )(context)
 
-export default R.curry(requestAction)
+export default R.curry(networkAction)

@@ -1,7 +1,7 @@
 /* eslint-env jest */
 
-import lifecycleAction from '~/src/crud/lifecycle-action'
-import requestAction from '~/src/crud/request-action'
+import lifecycleAction from '~/src/network/lifecycle-action'
+import networkAction from '~/src/network/action'
 import {
   expectDispatchedAction,
   mockDispatch
@@ -15,9 +15,9 @@ const lifecycleActions = {
   failure: jest.fn(lifecycleAction(actionType, 'failure', false))
 }
 
-describe('requestAction', () => {
+describe('networkAction', () => {
   const handler = jest.fn(() => Promise.resolve())
-  const actionCreator = requestAction(actionType, handler, lifecycleActions)()
+  const actionCreator = networkAction(actionType, handler, lifecycleActions)()
   const getState = () => ({
     [actionType]: {
       isFetching: false,
@@ -36,14 +36,14 @@ describe('requestAction', () => {
   })
 
   it('always passes getState to the request handler', () => {
-    const actionCreator = requestAction(actionType, handler, lifecycleActions)()
+    const actionCreator = networkAction(actionType, handler, lifecycleActions)()
     return actionCreator(dispatch, getState)
     .then(() => expect(handler).toHaveBeenCalledWith(undefined, getState))
   })
 
   it('passes context to the request handler, if given', () => {
     const context = () => ({ some: 'state' })
-    const actionCreator = requestAction(actionType, handler, lifecycleActions)(context)
+    const actionCreator = networkAction(actionType, handler, lifecycleActions)(context)
 
     return actionCreator(dispatch, getState)
     .then(() => expect(handler).toHaveBeenCalledWith(context, getState))
@@ -52,7 +52,7 @@ describe('requestAction', () => {
   describe('when the request succeeds', () => {
     const responseData = { firstName: 'Jonas' }
     const handler = (getBody, getState) => Promise.resolve(responseData)
-    const actionCreator = requestAction(actionType, handler, lifecycleActions)()
+    const actionCreator = networkAction(actionType, handler, lifecycleActions)()
 
     it('dispatches the success handler', () => {
       return actionCreator(dispatch, getState)
@@ -66,7 +66,7 @@ describe('requestAction', () => {
   describe('when the request fails', () => {
     const error = new Error({ some: 'error' })
     const handler = (getBody, getState) => Promise.reject(error)
-    const actionCreator = requestAction(actionType, handler, lifecycleActions)()
+    const actionCreator = networkAction(actionType, handler, lifecycleActions)()
 
     it('dispatches the success handler', () => {
       const result = actionCreator(dispatch, getState)

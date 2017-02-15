@@ -1,6 +1,6 @@
 /* eslint-env jest */
 
-import endpointAction from '~/src/crud/action'
+import endpointAction from '~/src/endpoint/action'
 import {
   expectDispatchedAction,
   mockDispatch
