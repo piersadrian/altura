@@ -13,14 +13,14 @@ import reducer, {
   type State
 } from '~/src/reducer'
 
-export const defaultCRUDState = (defaultResponseState: State) => ({
+export const defaultEndpointState = (defaultResponseState: State) => ({
   [inFlightStatusKey]: false,
   timestamp: null,
   data: defaultResponseState,
   error: null
 })
 
-export const configureCRUDMerger =
+export const endpointMerger =
   (defaultState: State): Reducer =>
   (state: State, action: Action): State =>
   R.pipe(
@@ -34,7 +34,7 @@ export const buildCombinedReducer =
   (defaultState: State, actionTypes: Array<ActionType>): Reducer =>
   (state: State, action: Action) =>
   R.pipe(
-    R.map(reducer(defaultState, R.__, configureCRUDMerger(defaultState))),
+    R.map(reducer(defaultState, R.__, endpointMerger(defaultState))),
     R.reduce(
       (state, reducer) => reducer(state, action),
       state
@@ -44,7 +44,7 @@ export const buildCombinedReducer =
 const endpointReducer =
   (defaultResponseState: State, actionType: ActionType): Reducer =>
   R.pipe(
-    defaultCRUDState,
+    defaultEndpointState,
     R.curry(buildCombinedReducer)(R.__, [
       makeActionType(actionType, 'request'),
       makeActionType(actionType, 'success'),

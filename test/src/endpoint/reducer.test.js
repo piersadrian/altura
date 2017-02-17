@@ -1,8 +1,8 @@
 /* eslint-env jest */
 
 import crudReducer, {
-  configureCRUDMerger,
-  defaultCRUDState
+  endpointMerger,
+  defaultEndpointState
 } from '~/src/endpoint/reducer'
 
 const defaultResponseState = { name: '', email: '' }
@@ -12,14 +12,14 @@ describe('crudReducer', () => {
   const state = { name: 'Tom Jones', email: 'tommy@welsh.singers' }
 
   it('embeds default response state in a CRUD-friendly structure', () => {
-    const previousState = defaultCRUDState(defaultResponseState)
+    const previousState = defaultEndpointState(defaultResponseState)
     const action = { type: 'request' }
     expect(reducer(previousState, action)).toEqual(previousState)
   })
 
   describe('when action type matches', () => {
     it('returns mutated state', () => {
-      const previousState = defaultCRUDState(state)
+      const previousState = defaultEndpointState(state)
       const action = { type: 'index.success', data: { name: 'Charlotte Church' } }
       expect(reducer(previousState, action).data).toEqual(action.data)
     })
@@ -27,15 +27,15 @@ describe('crudReducer', () => {
 
   describe('when action type does not match', () => {
     it('returns the given state', () => {
-      const previousState = defaultCRUDState(state)
+      const previousState = defaultEndpointState(state)
       const action = { type: 'otherAction', data: { name: 'Charlotte Church' } }
       expect(reducer(previousState, action)).toEqual(previousState)
     })
   })
 })
 
-describe('configureCRUDMerger', () => {
-  const merger = configureCRUDMerger(defaultCRUDState(defaultResponseState))
+describe('endpointMerger', () => {
+  const merger = endpointMerger(defaultEndpointState(defaultResponseState))
 
   it('only merges keys in the default state', () => {
     const newState = merger({ some: 'state' }, { type: 'some-action', isFetching: true, nope: 'blah' })
