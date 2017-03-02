@@ -10,7 +10,7 @@ const actionData = { data: { actionData: 'action-data' } }
 const action = R.merge(actionData, { type: 'action.type' })
 
 describe('configureReducer', () => {
-  const reducer = configureReducer(defaultState, 'action.type', merger)
+  const reducer = configureReducer(defaultState, merger, 'action.type')
 
   describe('when action does not match', () => {
     it('returns state if given', () => {

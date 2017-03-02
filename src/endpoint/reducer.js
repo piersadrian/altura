@@ -9,6 +9,7 @@ import {
 
 import { inFlightStatusKey } from '~/src/network/lifecycle-action'
 import reducer, {
+  mergeReducers,
   type Reducer,
   type State
 } from '~/src/reducer'
@@ -30,26 +31,17 @@ export const endpointMerger =
     R.merge(defaultState),
   )(action)
 
-export const buildCombinedReducer =
-  (defaultState: State, actionTypes: Array<ActionType>): Reducer =>
-  (state: State, action: Action) =>
-  R.pipe(
-    R.map(reducer(defaultState, R.__, endpointMerger(defaultState))),
-    R.reduce(
-      (state, reducer) => reducer(state, action),
-      state
-    )
-  )(actionTypes)
-
 const endpointReducer =
   (defaultResponseState: State, actionType: ActionType): Reducer =>
   R.pipe(
     defaultEndpointState,
-    R.curry(buildCombinedReducer)(R.__, [
+    (defaultState) => reducer(defaultState, endpointMerger(defaultState)),
+    R.map(R.__, [
       makeActionType(actionType, 'request'),
       makeActionType(actionType, 'success'),
       makeActionType(actionType, 'failure')
-    ])
+    ]),
+    mergeReducers
   )(defaultResponseState)
 
 export default R.curry(endpointReducer)

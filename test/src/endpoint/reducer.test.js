@@ -1,14 +1,14 @@
 /* eslint-env jest */
 
-import crudReducer, {
+import endpointReducer, {
   endpointMerger,
   defaultEndpointState
 } from '~/src/endpoint/reducer'
 
 const defaultResponseState = { name: '', email: '' }
 
-describe('crudReducer', () => {
-  const reducer = crudReducer(defaultResponseState, 'index')
+describe('endpointReducer', () => {
+  const reducer = endpointReducer(defaultResponseState, 'index')
   const state = { name: 'Tom Jones', email: 'tommy@welsh.singers' }
 
   it('embeds default response state in a CRUD-friendly structure', () => {

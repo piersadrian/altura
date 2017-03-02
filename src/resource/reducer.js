@@ -1,45 +1,63 @@
 // @flow
-
 import R from 'ramda'
 
-import { type Action } from '~/src/action'
-import reducer, { type State } from '~/src/reducer'
+import {
+  makeActionType,
+  type Action,
+  type ActionType
+} from '~/src/action'
 
-const replaceSingularResource =
+import reducer, {
+  mergeReducers,
+  type State
+} from '~/src/reducer'
+
+export const TYPES = {
+  add: 'add',
+  remove: 'remove'
+}
+
+export const addSingularResource =
   (state: State, action: Action) =>
   R.pipe(
-    R.pick('data'),
+    R.pick(['data']),
     R.merge(state)
   )(action)
 
-const addPluralResource =
+export const removeSingularResource =
+  (state: State, action: Action) =>
+  R.assoc('data', null, state)
+
+export const addPluralResource =
+  (key: string) =>
   (state: State, action: Action) =>
   R.pipe(
-    R.prop('data'),
-    R.append(R.__, state.data)
+    R.path(['data', key]),
+    R.assoc(R.__, action.data, state.data),
+    R.assoc('data', R.__, state)
   )(action)
 
-const removePluralResource =
+export const removePluralResource =
+  (key: string) =>
   (state: State, action: Action) =>
   R.pipe(
-    // { id: 233 }
-    R.toPairs,
-    R.head,
-    // [id, 223]
-    (key, value) => R.find(R.propEq(key, value), state.data),
-    R.when(
-      R.isNil,
-    )
-  )(R.prop('data', action))
+    R.path(['data', key]),
+    R.dissoc(R.__, state.data),
+    R.assoc('data', R.__, state)
+  )(action)
 
-const buildSingularReducer = () => {}
-const buildPluralReducer = () => {}
+export const singularReducer = R.curry(
+  (actionType: ActionType, defaultState: State) =>
+  mergeReducers([
+    reducer(defaultState, addSingularResource, makeActionType(actionType, TYPES.add)),
+    reducer(defaultState, removeSingularResource, makeActionType(actionType, TYPES.remove))
+  ])
+)
 
-export const buildReducer =
-  (name: string, defaultState: State, singular: boolean, key: string) =>
-  reducer(defaultState, name, merger)
-
-const resourceReducer =
-  (actionType) => {}
-
-export default resourceReducer
+export const pluralReducer = R.curry(
+  (actionType: ActionType, defaultState: State, key: string) =>
+  mergeReducers([
+    reducer(defaultState, addPluralResource(key), makeActionType(actionType, TYPES.add)),
+    reducer(defaultState, removePluralResource(key), makeActionType(actionType, TYPES.remove))
+  ])
+)

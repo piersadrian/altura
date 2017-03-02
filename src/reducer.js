@@ -14,11 +14,21 @@ const throwIfNoStateObject = R.when(
   (value) => { throw new Error(`reducer returned a ${typeof value}; should return an object`) }
 )
 
+export const mergeReducers =
+  (reducers: Array<Reducer>) =>
+  (state: State, action: Action) =>
+  R.reduce(
+    (state, reducer) => reducer(state, action),
+    state
+  )(reducers)
+
 const reducer =
-  (defaultState: State, actionType: ActionType, merger: Reducer): Reducer =>
+  (defaultState: State, merger: Reducer, actionType: ActionType): Reducer =>
   (state: State, action: Action): State =>
   R.ifElse(
-    R.propEq('type', actionType),
+    R.pipe(
+      R.propEq('type', actionType),
+    ),
     R.pipe(
       R.curry(merger)(R.defaultTo(defaultState, state)),
       throwIfNoStateObject
